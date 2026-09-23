@@ -12,25 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- A categorized link shows its category on the Dashboard tile and on All links, in front of the host (`Category · host`). All links still groups those links under the category heading.
-
-## 1.1.0 - 2026-09-16
-
-### Removed
-
-- Open modes are gone. `/open/{id}` always responds with 303 to the https URL.
-
-### Changed
-
-- Catalog is one list plus optional custom categories. Featured, Company, and Reference lanes are gone.
-- Tile subtitle is the host only. The widget title stays the translated app name.
-- Admins pick a Nextcloud icon or upload one.
-- Save shows a success note.
-- Admin OCS body is `{revision, categories, links}`. Schema 1 catalogs migrate on read.
-
-## 1.0.0 - 2026-09-16
+## 1.0.0 - 2026-09-23
 
 First version of Company Links Dashboard (`dashboard_links`).
 
@@ -45,3 +27,16 @@ First version of Company Links Dashboard (`dashboard_links`).
 - Privacy notice for opening a link (browser request to the destination).
 - Password confirmation on catalog save and icon upload.
 - German translations (`l10n/de`).
+
+### Changed
+
+- Catalog is one list plus optional custom categories. Featured, Company, and Reference lanes are gone.
+- A categorized link shows its category on the Dashboard tile and on All links, in front of the host (`Category · host`). All links still groups those links under the category heading.
+- The widget title stays the translated app name.
+- Admins pick a Nextcloud icon or upload one.
+- Save shows a success note.
+- Admin OCS body is `{revision, categories, links}`. Schema 1 catalogs migrate on read.
+
+### Removed
+
+- Open modes are gone. `/open/{id}` always responds with 303 to the https URL.

@@ -15,7 +15,7 @@
 	<description lang="de"><![CDATA[Admins pflegen einen Katalog von Firmenlinks in einer Liste, optional mit eigenen Kategorien. Nutzer sehen diese Links auf der Dashboard-Kachel und die volle Liste unter Alle Links. Ein Klick antwortet mit 303 auf die https-URL über `/open/{id}`, sodass Lesezeichen weiter funktionieren.
 
 **Datenschutz.** Diese App speichert keine Benutzerkonten und sendet keine Daten an den Autor. Ein Klick schickt den Browser des Nutzers an die vom Admin gewählte https-Adresse. Diese Seite kann die IP-Adresse, Browserdaten und oft die Nextcloud-Adresse als Referrer sehen. Admins müssen diese Ziele in der Datenschutzerklärung der Instanz nennen. Deinstallation löscht Katalog und hochgeladene Icons.]]></description>
-	<version>1.1.0</version>
+	<version>1.0.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author homepage="https://github.com/AWiesehoffe2">André Wiesehoff</author>
 	<namespace>DashboardLinks</namespace>
