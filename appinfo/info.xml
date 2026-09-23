@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+  SPDX-FileCopyrightText: 2026 André Wiesehoff
+  SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>dashboard_links</id>
+	<name>Company Links Dashboard</name>
+	<name lang="de">Firmenlinks</name>
+	<summary>Dashboard tile with admin-configured company links</summary>
+	<summary lang="de">Dashboard-Kachel mit vom Admin gepflegten Firmenlinks</summary>
+	<description><![CDATA[Admins maintain a catalog of company links in one list, with optional custom categories. Users see those links on the Dashboard tile and the full list on an All links page. Opening a link responds with 303 to the https URL through `/open/{id}` so bookmarks keep working.
+
+**Privacy.** This app does not store user accounts and does not send data to the author. Opening a link sends the user's browser to the administrator-chosen https address. That site can see the user's IP address, browser details, and often the Nextcloud address as referrer. Administrators must list those destinations in the instance privacy notice. Uninstall deletes the catalog and uploaded icons.]]></description>
+	<description lang="de"><![CDATA[Admins pflegen einen Katalog von Firmenlinks in einer Liste, optional mit eigenen Kategorien. Nutzer sehen diese Links auf der Dashboard-Kachel und die volle Liste unter Alle Links. Ein Klick antwortet mit 303 auf die https-URL über `/open/{id}`, sodass Lesezeichen weiter funktionieren.
+
+**Datenschutz.** Diese App speichert keine Benutzerkonten und sendet keine Daten an den Autor. Ein Klick schickt den Browser des Nutzers an die vom Admin gewählte https-Adresse. Diese Seite kann die IP-Adresse, Browserdaten und oft die Nextcloud-Adresse als Referrer sehen. Admins müssen diese Ziele in der Datenschutzerklärung der Instanz nennen. Deinstallation löscht Katalog und hochgeladene Icons.]]></description>
+	<version>1.1.0</version>
+	<licence>AGPL-3.0-or-later</licence>
+	<author homepage="https://github.com/AWiesehoffe2">André Wiesehoff</author>
+	<namespace>DashboardLinks</namespace>
+	<documentation>
+		<user>https://github.com/AWiesehoffe2/nextcloud-company-links#enable-the-app</user>
+		<admin>https://github.com/AWiesehoffe2/nextcloud-company-links#configure-the-catalog</admin>
+		<developer>https://github.com/AWiesehoffe2/nextcloud-company-links#for-developers</developer>
+	</documentation>
+	<category>dashboard</category>
+	<website>https://github.com/AWiesehoffe2/nextcloud-company-links</website>
+	<bugs>https://github.com/AWiesehoffe2/nextcloud-company-links/issues</bugs>
+	<repository type="git">https://github.com/AWiesehoffe2/nextcloud-company-links.git</repository>
+	<dependencies>
+		<php min-version="8.2" max-version="8.5"/>
+		<nextcloud min-version="33" max-version="35"/>
+	</dependencies>
+	<repair-steps>
+		<uninstall>
+			<step>OCA\DashboardLinks\Migration\Uninstall</step>
+		</uninstall>
+	</repair-steps>
+	<settings>
+		<admin>OCA\DashboardLinks\Settings\Admin</admin>
+		<admin-section>OCA\DashboardLinks\Settings\Section</admin-section>
+	</settings>
+</info>
