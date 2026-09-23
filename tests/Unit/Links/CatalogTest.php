@@ -324,14 +324,14 @@ final class CatalogTest extends TestCase {
 			'links' => [$this->row(self::INTRANET_ID, 'Intranet', 'https://intranet.example.com/')],
 		]);
 
-		$sections = $catalog->sections('Uncategorized');
+		$sections = $catalog->sections();
 
 		self::assertCount(1, $sections);
 		self::assertSame('', $sections[0]['label']);
 		self::assertSame('Intranet', $sections[0]['links']->links()[0]->title);
 	}
 
-	public function testSectionsWithCategoriesPutUncategorizedFirst(): void {
+	public function testSectionsWithCategoriesLeaveUncategorizedUntitled(): void {
 		$catalog = Catalog::parse([
 			'categories' => [
 				['id' => self::TOOLS_ID, 'title' => 'Tools'],
@@ -342,9 +342,9 @@ final class CatalogTest extends TestCase {
 			],
 		]);
 
-		$sections = $catalog->sections('Uncategorized');
+		$sections = $catalog->sections();
 
-		self::assertSame(['Uncategorized', 'Tools'], array_column($sections, 'label'));
+		self::assertSame(['', 'Tools'], array_column($sections, 'label'));
 		self::assertSame('Wiki', $sections[0]['links']->links()[0]->title);
 		self::assertSame('Intranet', $sections[1]['links']->links()[0]->title);
 	}

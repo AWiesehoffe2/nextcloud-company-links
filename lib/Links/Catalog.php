@@ -194,9 +194,11 @@ final readonly class Catalog implements \JsonSerializable, \Countable {
 	}
 
 	/**
+	 * Named categories keep their title. Links without a category stay in the list and get no heading.
+	 *
 	 * @return list<array{label: string, links: VisibleLinks}>
 	 */
-	public function sections(string $uncategorizedLabel): array {
+	public function sections(): array {
 		$visible = $this->visible()->links();
 		if ($this->categories === []) {
 			return [['label' => '', 'links' => VisibleLinks::fromEnabled($visible)]];
@@ -211,7 +213,7 @@ final readonly class Catalog implements \JsonSerializable, \Countable {
 		}
 		if ($uncategorized !== []) {
 			$sections[] = [
-				'label' => $uncategorizedLabel,
+				'label' => '',
 				'links' => VisibleLinks::fromEnabled($uncategorized),
 			];
 		}

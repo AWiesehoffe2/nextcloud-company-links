@@ -165,7 +165,7 @@ final class LinksWidget implements IAPIWidget, IIconWidget, IButtonWidget {
 	}
 
 	/**
-	 * First seven visible links, grouped under their category heading.
+	 * First seven visible links. Named categories keep a heading; links without one do not.
 	 *
 	 * @return list<array{label: string, links: list<array{title: string, subtitle: string, href: string}>}>
 	 */
@@ -173,7 +173,7 @@ final class LinksWidget implements IAPIWidget, IIconWidget, IButtonWidget {
 		$catalog = $this->store->current();
 		$remaining = self::WEB_TILE_LIMIT;
 		$sections = [];
-		foreach ($catalog->sections($this->l10n->t('Uncategorized')) as $section) {
+		foreach ($catalog->sections() as $section) {
 			if ($remaining < 1) {
 				break;
 			}

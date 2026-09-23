@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The Dashboard tile shows each category as a heading, with its links listed underneath. The host stays on the link, without the category name in front of it.
+- Links without a category stay in that list and get no heading.
 - All links uses the same heading and no longer repeats the category in front of the host.
 - Importing an External sites iframe stores the in-Nextcloud page `/apps/external/{id}/`. Redirect sites still store the https URL.
 - Import from External sites is shown only when that app has at least one site.

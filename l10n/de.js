@@ -41,7 +41,6 @@ OC.L10N.register(
 		"Configure" : "Einrichten",
 		"No company links" : "Keine Firmenlinks",
 		"Ask an administrator to add company links." : "Bitten Sie einen Administrator, Firmenlinks anzulegen.",
-		"Uncategorized" : "Ohne Kategorie",
 		"Link" : "Link",
 		"Time" : "Zeit",
 		"Mail" : "E-Mail",

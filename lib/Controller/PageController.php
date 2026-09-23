@@ -77,7 +77,7 @@ final class PageController extends Controller {
 	private function bands(): array {
 		$catalog = $this->store->current();
 		$bands = [];
-		foreach ($catalog->sections($this->l10n->t('Uncategorized')) as $section) {
+		foreach ($catalog->sections() as $section) {
 			$views = $this->presenter->views($section['links']);
 			if ($views === []) {
 				continue;
