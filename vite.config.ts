@@ -8,6 +8,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 export default createAppConfig({
 	admin: join(import.meta.dirname, 'src', 'admin.ts'),
+	dashboard: join(import.meta.dirname, 'src', 'dashboard.ts'),
 }, {
 	minify: isProduction,
 	inlineCSS: true,

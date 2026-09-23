@@ -32,3 +32,23 @@ export interface FieldError {
 	field: string
 	message: string
 }
+
+export interface TileLink {
+	title: string
+	subtitle: string
+	href: string
+}
+
+export interface TileSection {
+	label: string
+	links: TileLink[]
+}
+
+export interface TileState {
+	sections: TileSection[]
+	emptyTitle: string
+	moreLabel: string
+	moreUrl: string | null
+	setupLabel: string
+	setupUrl: string | null
+}

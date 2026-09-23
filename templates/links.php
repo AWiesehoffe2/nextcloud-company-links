@@ -32,7 +32,7 @@ if (function_exists('style')) {
 						<a href="<?php echo htmlspecialchars($link['url'], ENT_QUOTES, 'UTF-8'); ?>">
 							<img src="<?php echo htmlspecialchars($link['iconUrl'], ENT_QUOTES, 'UTF-8'); ?>" alt="">
 							<span class="dashboard-links-item-text">
-								<span class="dashboard-links-item-title"><?php echo htmlspecialchars($link['title'], ENT_QUOTES, 'UTF-8'); ?></span>
+								<span class="dashboard-links-item-title"><span class="dashboard-links-item-arrow" aria-hidden="true">→</span><?php echo htmlspecialchars($link['title'], ENT_QUOTES, 'UTF-8'); ?></span>
 								<span class="dashboard-links-item-subtitle"><?php echo htmlspecialchars($link['subtitle'], ENT_QUOTES, 'UTF-8'); ?></span>
 							</span>
 						</a>

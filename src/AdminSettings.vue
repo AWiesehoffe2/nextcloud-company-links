@@ -33,7 +33,7 @@
 			{{ notice }}
 		</NcNoteCard>
 
-		<div v-if="externalSitesAvailable" class="dashboard-links-toolbar">
+		<div v-if="externalSites.length > 0" class="dashboard-links-toolbar">
 			<NcButton :disabled="importing || saving" @click="importExternalSites">
 				{{ t('dashboard_links', 'Import from External sites') }}
 			</NcButton>
@@ -165,7 +165,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { t } from '@nextcloud/l10n'
 import { confirmPassword } from '@nextcloud/password-confirmation'
 import { generateOcsUrl, generateUrl } from '@nextcloud/router'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
@@ -180,10 +180,18 @@ interface SelectOption {
 	label: string
 }
 
+interface ExternalSite {
+	id?: unknown
+	name?: unknown
+	url?: unknown
+	redirect?: unknown
+}
+
 const DEFAULT_CATEGORY_ID = ''
 
 const catalog = ref(cloneEnvelope(loadState<CatalogEnvelope>('dashboard_links', 'catalog')))
 const externalSitesAvailable = loadState<boolean>('dashboard_links', 'externalSitesAvailable', false)
+const externalSites = ref<ExternalSite[]>([])
 const coreIcons = loadState<CoreIconChoice[]>('dashboard_links', 'coreIcons', [])
 const fieldErrors = ref<FieldError[]>([])
 const notices = ref<string[]>([])
@@ -196,6 +204,10 @@ const importing = ref(false)
 const iconUrls = ref<Record<string, string>>(coreIconUrls(coreIcons))
 const fileInput = ref<HTMLInputElement | null>(null)
 const pendingIconIndex = ref<number | null>(null)
+
+onMounted(() => {
+	void loadExternalSites()
+})
 
 const categoryOptions = computed<SelectOption[]>(() => [
 	{ id: DEFAULT_CATEGORY_ID, label: t('dashboard_links', 'Default') },
@@ -557,14 +569,80 @@ async function save(): Promise<void> {
 }
 
 /**
+ * External sites embeds a site unless redirect is set. The iframe lives on
+ * `/apps/external/{id}/`, not on the framed URL.
+ *
+ * @param site External sites admin row
+ */
+function siteOpensInIframe(site: ExternalSite): boolean {
+	const redirect = site.redirect
+	return redirect !== true && redirect !== 1 && redirect !== '1'
+}
+
+/**
+ * @param value External site id
+ */
+function externalSiteId(value: unknown): string | null {
+	if (typeof value === 'number' && Number.isInteger(value) && value > 0) {
+		return String(value)
+	}
+	if (typeof value === 'string' && /^[1-9]\d*$/.test(value)) {
+		return value
+	}
+	return null
+}
+
+/**
+ * Absolute https URL of the in-Nextcloud External sites page.
+ *
+ * @param id Numeric site id
+ */
+function externalSitePageHref(id: string): string {
+	const path = generateUrl('/apps/external/{id}/', { id })
+	return new URL(path, window.location.href).href
+}
+
+/**
+ * @param site External sites admin row
+ */
+function hrefForExternalSite(site: ExternalSite): string | null {
+	if (!siteOpensInIframe(site)) {
+		return typeof site.url === 'string' ? site.url : null
+	}
+	const id = externalSiteId(site.id)
+	return id === null ? null : externalSitePageHref(id)
+}
+
+/**
+ * @return false when the External sites request failed
+ */
+async function loadExternalSites(): Promise<boolean> {
+	if (!externalSitesAvailable) {
+		externalSites.value = []
+		return true
+	}
+	try {
+		const { data } = await axios.get(generateOcsUrl('/apps/external/api/v1/sites'))
+		externalSites.value = sitesFromExternalPayload(readOcsData(data))
+		return true
+	} catch {
+		externalSites.value = []
+		return false
+	}
+}
+
+/**
  * Browser-only import. Nothing is stored until Save.
  */
 async function importExternalSites(): Promise<void> {
 	importing.value = true
 	notices.value = []
 	try {
-		const { data } = await axios.get(generateOcsUrl('/apps/external/api/v1/sites'))
-		const sites = sitesFromExternalPayload(readOcsData(data))
+		const loaded = await loadExternalSites()
+		if (!loaded) {
+			notices.value = [t('dashboard_links', 'Could not load External sites.')]
+			return
+		}
 		const existing = new Set<string>()
 		for (const row of catalog.value.links) {
 			const normalized = normalizeHttps(row.href)
@@ -576,9 +654,13 @@ async function importExternalSites(): Promise<void> {
 		let imported = 0
 		let skippedScheme = 0
 		let skippedDup = 0
-		for (const site of sites) {
+		for (const site of externalSites.value) {
 			const title = typeof site.name === 'string' ? site.name : ''
-			const href = typeof site.url === 'string' ? site.url : ''
+			const href = hrefForExternalSite(site)
+			if (href === null) {
+				skippedScheme += 1
+				continue
+			}
 			const normalized = normalizeHttps(href)
 			if (normalized === null) {
 				skippedScheme += 1
@@ -715,14 +797,13 @@ function asFieldErrors(payload: unknown): FieldError[] {
 /**
  * @param payload External sites OCS body
  */
-function sitesFromExternalPayload(payload: unknown): Array<{ name?: unknown, url?: unknown, redirect?: unknown }> {
-	if (Array.isArray(payload)) {
-		return payload
-	}
-	if (payload !== null && typeof payload === 'object' && 'sites' in payload && Array.isArray(payload.sites)) {
-		return payload.sites
-	}
-	return []
+function sitesFromExternalPayload(payload: unknown): ExternalSite[] {
+	const rows = Array.isArray(payload)
+		? payload
+		: payload !== null && typeof payload === 'object' && 'sites' in payload && Array.isArray(payload.sites)
+			? payload.sites
+			: []
+	return rows.filter((row): row is ExternalSite => row !== null && typeof row === 'object')
 }
 
 /**

@@ -95,7 +95,7 @@ final class PageControllerTest extends TestCase {
 
 		self::assertSame(['Uncategorized', 'Tools'], array_column($bands, 'label'));
 		self::assertSame('wiki.example.com', $bands[0]['links'][0]['subtitle']);
-		self::assertSame('Tools · intranet.example.com', $bands[1]['links'][0]['subtitle']);
+		self::assertSame('intranet.example.com', $bands[1]['links'][0]['subtitle']);
 		self::assertSame('Intranet', $bands[1]['links'][0]['title']);
 	}
 

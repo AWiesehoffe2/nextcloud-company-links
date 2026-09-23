@@ -7,7 +7,7 @@
 
 A Dashboard tile of admin-configured company links. App id `dashboard_links`, PHP namespace `OCA\DashboardLinks`, licence [AGPL-3.0-or-later](LICENSES/AGPL-3.0-or-later.txt). Requires Nextcloud 33–35 and PHP 8.2–8.5.
 
-The tile is an `IAPIWidgetV2` widget. This app ships no dashboard JavaScript; Nextcloud’s own Dashboard renders the items from the widget payload.
+On the Dashboard, each category is a heading and its links are listed under it. Phone and desktop clients still receive a flat list from the widget API.
 
 ## Enable the app
 
@@ -46,7 +46,7 @@ Each row has:
 - **Title**. 1–120 characters.
 - **URL**. `https` only. `http`, `mailto`, and URLs with embedded credentials are rejected.
 - **Icon**. A Nextcloud core icon or an upload stored in this app and served from your Nextcloud origin.
-- **Category**. Optional. Missing or empty means the default list. On the Dashboard tile and on All links, an assigned category is shown in front of the host. All links also groups those links under the category name.
+- **Category**. Optional. Missing or empty means the default list. On the Dashboard tile and on All links, a category is the heading and its links are listed under it. The line under a link is the host.
 - **Enabled**. Off hides the link without deleting it.
 
 `/open/{id}` responds with 303 to the https URL. Bookmarks to that path keep working.
@@ -103,7 +103,7 @@ A category is `{id, title}`. A link is `{id, title, href, icon, categoryId, enab
 
 `revision` is the first 12 hex characters of SHA-256 over the canonical categories and links. It is not stored as its own config key. A schema 1 catalog (flat `links` with `importance`) is read as the default list. The next save writes schema 2.
 
-Optional import from the official External sites app is browser-only. When `externalSitesAvailable` is true, the settings page can GET External sites and append rows to the default list. Nothing is stored until Save. This app never reads or writes External sites’ configuration on the server.
+Optional import from the official External sites app is browser-only. The import control is shown only when that app is enabled and has at least one site. An iframe site is stored as the in-Nextcloud page `/apps/external/{id}/`, so opening it stays inside External sites. A redirect site is stored as its https URL. Nothing is stored until Save. This app never reads or writes External sites’ configuration on the server.
 
 ## For developers
 
@@ -116,7 +116,7 @@ npm run lint
 npm run build
 ```
 
-`composer cs:fix` applies the Nextcloud coding standard. There is no dashboard JavaScript; `npm run build` emits the admin settings bundle.
+`composer cs:fix` applies the Nextcloud coding standard. `npm run build` emits the admin settings bundle and the Dashboard tile.
 
 ## App store
 

@@ -1,0 +1,95 @@
+/**
+ * SPDX-FileCopyrightText: 2026 André Wiesehoff
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+.icon-dashboard_links {
+	background-image: url('../img/app-dark.svg');
+	filter: var(--background-invert-if-dark);
+}
+
+.dashboard-links-tile {
+	display: flex;
+	flex-direction: column;
+	gap: calc(var(--default-grid-baseline, 4px) * 2);
+}
+
+.dashboard-links-tile-empty {
+	margin: 0;
+	color: var(--color-text-maxcontrast);
+}
+
+.dashboard-links-tile-heading {
+	margin: calc(var(--default-grid-baseline, 4px) * 2) 0 0;
+	font-size: 1.15rem;
+	font-weight: 700;
+	line-height: 1.3;
+}
+
+.dashboard-links-tile-section:first-child .dashboard-links-tile-heading {
+	margin-top: 0;
+}
+
+.dashboard-links-tile-list {
+	list-style: none;
+	margin: 0;
+	padding: 0 0 0 0.25rem;
+}
+
+.dashboard-links-tile-link {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	padding: 4px 8px;
+	border-radius: var(--border-radius-large, 8px);
+	color: var(--color-main-text);
+	text-decoration: none;
+}
+
+.dashboard-links-tile-link:hover,
+.dashboard-links-tile-link:focus-visible {
+	background-color: var(--color-background-hover);
+}
+
+.dashboard-links-tile-arrow {
+	flex-shrink: 0;
+	line-height: 1.3;
+	color: var(--color-text-maxcontrast);
+}
+
+.dashboard-links-tile-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.dashboard-links-tile-title,
+.dashboard-links-tile-host {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.dashboard-links-tile-title {
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+.dashboard-links-tile-host {
+	color: var(--color-text-maxcontrast);
+	font-size: var(--font-size-small, 13px);
+	line-height: 1.3;
+}
+
+.dashboard-links-tile-more {
+	align-self: flex-start;
+	margin-top: calc(var(--default-grid-baseline, 4px) * 2);
+	color: var(--color-primary-element);
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.dashboard-links-tile-more:hover,
+.dashboard-links-tile-more:focus-visible {
+	text-decoration: underline;
+}

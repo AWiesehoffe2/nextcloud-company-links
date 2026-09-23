@@ -17,8 +17,10 @@ use OCA\DashboardLinks\Links\LinkUrls;
 use OCA\DashboardLinks\Tests\Support\FakeUrlGenerator;
 use OCA\DashboardLinks\Tests\Support\IdentityL10N;
 use OCA\DashboardLinks\Tests\Support\InMemoryAppConfig;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\Dashboard\Model\WidgetButton;
 use OCP\IGroupManager;
+use OCP\IUserSession;
 use PHPUnit\Framework\TestCase;
 
 final class LinksWidgetTest extends TestCase {
@@ -44,13 +46,15 @@ final class LinksWidgetTest extends TestCase {
 			$this->store,
 			new LinkPresenter($urls),
 			$urls,
+			$this->createStub(IUserSession::class),
+			$this->createStub(IInitialState::class),
 		);
 	}
 
 	public function testGetItemsV2ReturnsSevenTitlesInListOrder(): void {
 		$this->replaceEightVisible();
 
-		$items = $this->widget->getItemsV2('alice', null, 7)->getItems();
+		$items = $this->widget->getItems('alice', null, 7);
 
 		self::assertCount(7, $items);
 		self::assertSame(
@@ -94,16 +98,64 @@ final class LinksWidgetTest extends TestCase {
 		]);
 		$this->store->replace($catalog, $this->store->current()->revision());
 
-		$items = $this->widget->getItemsV2('alice', null, 7)->getItems();
+		$items = $this->widget->getItems('alice', null, 7);
 
 		self::assertSame('Tools · intranet.example.com', $items[0]->getSubtitle());
 		self::assertSame('wiki.example.com', $items[1]->getSubtitle());
 	}
 
+	public function testTileGroupsLinksUnderCategoryHeadings(): void {
+		$catalog = Catalog::parse([
+			'categories' => [
+				['id' => self::TOOLS_ID, 'title' => 'Tools'],
+			],
+			'links' => [
+				$this->row(self::INTRANET_ID, 'Intranet', 'https://intranet.example.com/', self::TOOLS_ID),
+				$this->row(self::WIKI_ID, 'Wiki', 'https://wiki.example.com/', self::TOOLS_ID),
+			],
+		]);
+		$this->store->replace($catalog, $this->store->current()->revision());
+
+		$tile = $this->widget->tileState('alice');
+
+		self::assertSame(['Tools'], array_column($tile['sections'], 'label'));
+		self::assertSame(
+			['Intranet', 'Wiki'],
+			array_map(static fn (array $link): string => $link['title'], $tile['sections'][0]['links']),
+		);
+		self::assertSame('intranet.example.com', $tile['sections'][0]['links'][0]['subtitle']);
+		self::assertStringNotContainsString('Tools', $tile['sections'][0]['links'][0]['subtitle']);
+		self::assertNull($tile['moreUrl']);
+		self::assertNull($tile['setupUrl']);
+	}
+
+	public function testTileMoreUrlWhenMoreThanSevenVisible(): void {
+		$this->replaceEightVisible();
+
+		$tile = $this->widget->tileState('alice');
+		$count = 0;
+		foreach ($tile['sections'] as $section) {
+			$count += count($section['links']);
+		}
+
+		self::assertSame(7, $count);
+		self::assertSame('https://cloud.example.test/apps/dashboard_links/', $tile['moreUrl']);
+		self::assertNull($tile['setupUrl']);
+	}
+
+	public function testTileSetupUrlForEmptyAdminOnly(): void {
+		$admin = $this->widget->tileState('admin');
+		$alice = $this->widget->tileState('alice');
+
+		self::assertSame([], $admin['sections']);
+		self::assertSame('https://cloud.example.test/settings/admin/dashboard_links', $admin['setupUrl']);
+		self::assertNull($alice['setupUrl']);
+	}
+
 	public function testItemLinkUsesOpenRouteAndId(): void {
 		$this->replaceEightVisible();
 
-		$link = $this->widget->getItemsV2('alice', null, 7)->getItems()[0]->getLink();
+		$link = $this->widget->getItems('alice', null, 7)[0]->getLink();
 
 		self::assertStringContainsString('/open/', $link);
 		self::assertStringContainsString(self::INTRANET_ID, $link);

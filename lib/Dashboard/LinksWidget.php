@@ -15,17 +15,18 @@ use OCA\DashboardLinks\Links\LinkId;
 use OCA\DashboardLinks\Links\LinkPresenter;
 use OCA\DashboardLinks\Links\LinkUrls;
 use OCA\DashboardLinks\Links\LinkView;
+use OCP\AppFramework\Services\IInitialState;
 use OCP\Dashboard\IAPIWidget;
-use OCP\Dashboard\IAPIWidgetV2;
 use OCP\Dashboard\IButtonWidget;
 use OCP\Dashboard\IIconWidget;
 use OCP\Dashboard\Model\WidgetButton;
 use OCP\Dashboard\Model\WidgetItem;
-use OCP\Dashboard\Model\WidgetItems;
 use OCP\IGroupManager;
 use OCP\IL10N;
+use OCP\IUserSession;
+use OCP\Util;
 
-final class LinksWidget implements IAPIWidget, IAPIWidgetV2, IIconWidget, IButtonWidget {
+final class LinksWidget implements IAPIWidget, IIconWidget, IButtonWidget {
 	public const ID = Application::APP_ID;
 	public const ORDER = 20;
 
@@ -37,6 +38,8 @@ final class LinksWidget implements IAPIWidget, IAPIWidgetV2, IIconWidget, IButto
 		private readonly CatalogStore $store,
 		private readonly LinkPresenter $presenter,
 		private readonly LinkUrls $urls,
+		private readonly IUserSession $userSession,
+		private readonly IInitialState $initialState,
 	) {
 	}
 
@@ -72,6 +75,13 @@ final class LinksWidget implements IAPIWidget, IAPIWidgetV2, IIconWidget, IButto
 
 	#[\Override]
 	public function load(): void {
+		$user = $this->userSession->getUser();
+		$this->initialState->provideInitialState(
+			'tile',
+			$this->tileState($user?->getUID() ?? ''),
+		);
+		Util::addScript(Application::APP_ID, Application::APP_ID . '-dashboard');
+		Util::addStyle(Application::APP_ID, 'dashboard');
 	}
 
 	/** @return list<WidgetItem> */
@@ -80,12 +90,31 @@ final class LinksWidget implements IAPIWidget, IAPIWidgetV2, IIconWidget, IButto
 		return $this->page($since, $limit);
 	}
 
-	#[\Override]
-	public function getItemsV2(string $userId, ?string $since = null, int $limit = 7): WidgetItems {
-		return new WidgetItems(
-			$this->page($since, $limit),
-			$this->l10n->t('No company links configured yet'),
-		);
+	/**
+	 * Grouped tile for the browser. Clients still use the flat {@see getItems()} list.
+	 *
+	 * @return array{
+	 *     sections: list<array{label: string, links: list<array{title: string, subtitle: string, href: string}>}>,
+	 *     emptyTitle: string,
+	 *     moreLabel: string,
+	 *     moreUrl: ?string,
+	 *     setupLabel: string,
+	 *     setupUrl: ?string
+	 * }
+	 */
+	public function tileState(string $userId): array {
+		$visibleCount = count($this->store->current()->visible());
+
+		return [
+			'sections' => $this->tileSections(),
+			'emptyTitle' => $this->l10n->t('No company links configured yet'),
+			'moreLabel' => $this->l10n->t('All links'),
+			'moreUrl' => $visibleCount > self::WEB_TILE_LIMIT ? $this->urls->allLinksUrl() : null,
+			'setupLabel' => $this->l10n->t('Configure'),
+			'setupUrl' => $visibleCount === 0 && $this->groupManager->isAdmin($userId)
+				? $this->urls->settingsUrl()
+				: null,
+		];
 	}
 
 	/** @return list<WidgetButton> */
@@ -133,5 +162,40 @@ final class LinksWidget implements IAPIWidget, IAPIWidgetV2, IIconWidget, IButto
 			),
 			$views,
 		);
+	}
+
+	/**
+	 * First seven visible links, grouped under their category heading.
+	 *
+	 * @return list<array{label: string, links: list<array{title: string, subtitle: string, href: string}>}>
+	 */
+	private function tileSections(): array {
+		$catalog = $this->store->current();
+		$remaining = self::WEB_TILE_LIMIT;
+		$sections = [];
+		foreach ($catalog->sections($this->l10n->t('Uncategorized')) as $section) {
+			if ($remaining < 1) {
+				break;
+			}
+			$views = $this->presenter->views($section['links']->take($remaining));
+			if ($views === []) {
+				continue;
+			}
+			$remaining -= count($views);
+			$links = [];
+			foreach ($views as $view) {
+				$links[] = [
+					'title' => $view->title,
+					'subtitle' => $view->subtitle,
+					'href' => $view->href,
+				];
+			}
+			$sections[] = [
+				'label' => $section['label'],
+				'links' => $links,
+			];
+		}
+
+		return $sections;
 	}
 }
