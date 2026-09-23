@@ -205,8 +205,14 @@ const iconUrls = ref<Record<string, string>>(coreIconUrls(coreIcons))
 const fileInput = ref<HTMLInputElement | null>(null)
 const pendingIconIndex = ref<number | null>(null)
 
-onMounted(() => {
-	void loadExternalSites()
+onMounted(async () => {
+	if (!externalSitesAvailable) {
+		return
+	}
+	const loaded = await loadExternalSites()
+	if (!loaded) {
+		notices.value = [t('dashboard_links', 'Could not load External sites.')]
+	}
 })
 
 const categoryOptions = computed<SelectOption[]>(() => [

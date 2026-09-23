@@ -11,7 +11,9 @@ export default createAppConfig({
 	dashboard: join(import.meta.dirname, 'src', 'dashboard.ts'),
 }, {
 	minify: isProduction,
-	inlineCSS: true,
+	inlineCSS: {
+		jsAssetsFilterFunction: (outputChunk) => outputChunk.fileName.endsWith('dashboard_links-admin.mjs'),
+	},
 	extractLicenseInformation: true,
 	thirdPartyLicense: false,
 })
