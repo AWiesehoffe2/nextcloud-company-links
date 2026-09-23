@@ -116,8 +116,10 @@ final class LinksWidget implements IAPIWidget, IAPIWidgetV2, IIconWidget, IButto
 
 	/** @return list<WidgetItem> */
 	private function page(?string $since, int $limit): array {
+		$catalog = $this->store->current();
 		$views = $this->presenter->views(
-			$this->store->current()->visible()->after(LinkId::tryParse($since))->take($limit),
+			$catalog->visible()->after(LinkId::tryParse($since))->take($limit),
+			$catalog->categoryTitles(),
 		);
 
 		return array_map(

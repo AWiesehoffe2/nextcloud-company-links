@@ -16,14 +16,13 @@
 	margin-block-end: calc(var(--default-grid-baseline, 4px) * 6);
 }
 
-.dashboard-links-band > h3 {
+.dashboard-links-band-label {
+	display: block;
 	margin: 0 0 calc(var(--default-grid-baseline, 4px) * 2);
 	font-size: var(--default-font-size, 15px);
-	color: var(--color-text-maxcontrast);
-}
-
-.dashboard-links-band > h3:empty {
-	display: none;
+	font-weight: 700;
+	line-height: 1.3;
+	color: var(--color-main-text);
 }
 
 .dashboard-links-list {

@@ -46,7 +46,7 @@ Each row has:
 - **Title**. 1–120 characters.
 - **URL**. `https` only. `http`, `mailto`, and URLs with embedded credentials are rejected.
 - **Icon**. A Nextcloud core icon or an upload stored in this app and served from your Nextcloud origin.
-- **Category**. Optional. Missing or empty means the default list.
+- **Category**. Optional. Missing or empty means the default list. On the Dashboard tile and on All links, an assigned category is shown in front of the host. All links also groups those links under the category name.
 - **Enabled**. Off hides the link without deleting it.
 
 `/open/{id}` responds with 303 to the https URL. Bookmarks to that path keep working.

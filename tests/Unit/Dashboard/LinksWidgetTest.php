@@ -25,6 +25,7 @@ final class LinksWidgetTest extends TestCase {
 	private const INTRANET_ID = '6d4f0c4e-6a8c-4a0b-9d3a-2f0a1c3b5e7d';
 	private const WIKI_ID = 'a1b2c3d4-e5f6-4789-8abc-def012345678';
 	private const HANDBOOK_ID = 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+	private const TOOLS_ID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
 	private CatalogStore $store;
 	private LinksWidget $widget;
@@ -81,6 +82,24 @@ final class LinksWidgetTest extends TestCase {
 		self::assertSame([], $this->widget->getWidgetButtons('alice'));
 	}
 
+	public function testCategorizedItemSubtitleLeadsWithCategory(): void {
+		$catalog = Catalog::parse([
+			'categories' => [
+				['id' => self::TOOLS_ID, 'title' => 'Tools'],
+			],
+			'links' => [
+				$this->row(self::INTRANET_ID, 'Intranet', 'https://intranet.example.com/', self::TOOLS_ID),
+				$this->row(self::WIKI_ID, 'Wiki', 'https://wiki.example.com/'),
+			],
+		]);
+		$this->store->replace($catalog, $this->store->current()->revision());
+
+		$items = $this->widget->getItemsV2('alice', null, 7)->getItems();
+
+		self::assertSame('Tools · intranet.example.com', $items[0]->getSubtitle());
+		self::assertSame('wiki.example.com', $items[1]->getSubtitle());
+	}
+
 	public function testItemLinkUsesOpenRouteAndId(): void {
 		$this->replaceEightVisible();
 
@@ -109,15 +128,15 @@ final class LinksWidgetTest extends TestCase {
 	}
 
 	/**
-	 * @return array{id: string, title: string, href: string, icon: null, categoryId: null, enabled: bool}
+	 * @return array{id: string, title: string, href: string, icon: null, categoryId: ?string, enabled: bool}
 	 */
-	private function row(string $id, string $title, string $href): array {
+	private function row(string $id, string $title, string $href, ?string $categoryId = null): array {
 		return [
 			'id' => $id,
 			'title' => $title,
 			'href' => $href,
 			'icon' => null,
-			'categoryId' => null,
+			'categoryId' => $categoryId,
 			'enabled' => true,
 		];
 	}

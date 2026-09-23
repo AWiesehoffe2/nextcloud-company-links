@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- A categorized link shows its category on the Dashboard tile and on All links, in front of the host (`Category · host`). All links still groups those links under the category heading.
+
 ## 1.1.0 - 2026-09-16
 
 ### Removed

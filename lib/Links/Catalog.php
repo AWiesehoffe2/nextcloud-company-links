@@ -249,6 +249,18 @@ final readonly class Catalog implements \JsonSerializable, \Countable {
 		return $this->categories;
 	}
 
+	/**
+	 * @return array<string, string> category id => title
+	 */
+	public function categoryTitles(): array {
+		$titles = [];
+		foreach ($this->categories as $category) {
+			$titles[(string)$category->id] = $category->title;
+		}
+
+		return $titles;
+	}
+
 	/** @return list<CompanyLink> */
 	public function links(): array {
 		return $this->links;

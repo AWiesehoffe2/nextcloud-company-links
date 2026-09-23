@@ -24,7 +24,7 @@ if (function_exists('style')) {
 	<?php foreach ($_['bands'] as $band) { ?>
 		<section class="dashboard-links-band">
 			<?php if ($band['label'] !== '') { ?>
-				<h3><?php echo htmlspecialchars($band['label'], ENT_QUOTES, 'UTF-8'); ?></h3>
+				<h3 class="dashboard-links-band-label"><?php echo htmlspecialchars($band['label'], ENT_QUOTES, 'UTF-8'); ?></h3>
 			<?php } ?>
 			<ul class="dashboard-links-list">
 				<?php foreach ($band['links'] as $link) { ?>

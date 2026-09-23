@@ -75,9 +75,11 @@ final class PageController extends Controller {
 	 * @return list<array{label: string, links: list<array{title: string, url: string, iconUrl: string, subtitle: string}>}>
 	 */
 	private function bands(): array {
+		$catalog = $this->store->current();
+		$titles = $catalog->categoryTitles();
 		$bands = [];
-		foreach ($this->store->current()->sections($this->l10n->t('Uncategorized')) as $section) {
-			$views = $this->presenter->views($section['links']);
+		foreach ($catalog->sections($this->l10n->t('Uncategorized')) as $section) {
+			$views = $this->presenter->views($section['links'], $titles);
 			if ($views === []) {
 				continue;
 			}
